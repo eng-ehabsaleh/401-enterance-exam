@@ -9,6 +9,8 @@ class FavFruit extends React.Component {
 
     this.state = {
       favArr: [],
+      showUpdateModalse: false,
+      selectedFruit: {},
     };
   }
   handeldelet = (frtId) => {
@@ -24,11 +26,12 @@ class FavFruit extends React.Component {
       })
       .catch(() => alert("fruit was not deleted"));
   };
-  updateFruit = (frt) => {
+  updateFruit = (e) => {
+    //sadly  icould not add the name attribute to the form controll
     const reqBody = {
-      fruits_name: frt.name,
-      fruits_image: frt.image,
-      fruits_price: frt.price,
+      fruits_name: e.target.name.value,
+      fruits_image: e.target.name.value,
+      fruits_price: e.target.name.value,
       email: this.props.auth0.user.email,
     };
     axios
@@ -41,8 +44,15 @@ class FavFruit extends React.Component {
           return ele;
         });
         this.setState({ favArr: newArr });
+        this.handelDisplayUpdateModal;
       })
       .catch(() => alert("data was not updated"));
+  };
+  handelDisplayUpdateModal = (fruitObj) => {
+    this.setState({
+      showUpdateModalse: !this.state.showUpdateModalse,
+      selectedFruit: fruitObj,
+    });
   };
   componentDidMount() {
     axios
@@ -56,6 +66,13 @@ class FavFruit extends React.Component {
     return (
       <>
         <h1>My Favorite Fruits</h1>
+        {this.state.showUpdateModalse && (
+          <UpdateModal
+            updateFruit={this.updateFruit}
+            show={this.state.showUpdateModalse}
+            handelDisplayUpdateModal={this.handelDisplayUpdateModal}
+          />
+        )}
         <>
           {this.state.favArr.map((frt) => {
             return (
@@ -66,7 +83,7 @@ class FavFruit extends React.Component {
                   <Card.Text>{frt.price}</Card.Text>
                   <Button
                     variant="primary"
-                    onClick={() => this.updateFruit(frt._id)}
+                    onClick={() => this.handelDisplayUpdateModal(frt)}
                   >
                     Update
                   </Button>
